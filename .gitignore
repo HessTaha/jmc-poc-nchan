@@ -4,3 +4,4 @@ python
 nchan
 target
 mongo-data
+.env

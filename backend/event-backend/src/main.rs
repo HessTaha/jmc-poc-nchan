@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
     let user = env::var("MONGO_INITDB_ROOT_USERNAME").unwrap();
     let password = env::var("MONGO_INITDB_ROOT_PASSWORD").unwrap();
     let host: &str = &format!(
-        "mongodb://{}:{}@localhost:27017/?authSource=admin",
+        "mongodb://{}:{}@mongo:27017/?authSource=admin",
         user, password
     );
     let db_pool = db_pool(host).await.unwrap();
