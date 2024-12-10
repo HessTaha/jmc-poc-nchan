@@ -9,5 +9,5 @@ curl -X POST http://localhost:8080/command/register_new_event \
            "description": "Une conférence dédiée au langage Rust."
          }'
 
-curl -X GET 127.0.0.1:8080/ready 
+curl -X GET http://localhost:8080/ready 
 
