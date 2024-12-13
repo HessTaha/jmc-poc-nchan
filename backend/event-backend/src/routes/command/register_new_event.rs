@@ -16,7 +16,8 @@ async fn register_new_event(
 
     let event_to_doc = doc! {
         "titre de l'evenement": &event.titre_de_levenement,
-        // TODO implement special parsers for date and enum types
+        "type de l'evenemnt": &event.type_de_levenement.to_string(),
+        "data": &event.date.to_string(),
         "lieu": &event.lieu,
         "organisateur": &event.organisateur,
         "description": &event.description
