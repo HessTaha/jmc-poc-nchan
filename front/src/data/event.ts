@@ -1,8 +1,8 @@
 export interface Event {
-  title: string;
-  type: "rencontre" | "petite annonce";
+  titre_de_levenement: string;
+  type_de_levenement: "rencontre" | "petiteannonce";
   date: string;
-  location: string;
-  organizer: string;
+  lieu: string;
+  organisateur: string;
   description: string;
 };

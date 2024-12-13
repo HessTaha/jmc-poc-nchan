@@ -5,3 +5,4 @@ nchan
 target
 mongo-data
 .env
+node_modules

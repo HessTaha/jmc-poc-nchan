@@ -20,10 +20,9 @@ impl EventType {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RencontreEvent {
-    pub titre_de_levenement: String,
+    pub titre_de_levenement: Option<String>,
 
     pub type_de_levenement: EventType,
-
     pub date: DateTime<Utc>,
 
     pub lieu: String,

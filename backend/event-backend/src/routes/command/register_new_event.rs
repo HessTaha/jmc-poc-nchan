@@ -14,6 +14,8 @@ async fn register_new_event(
 ) -> HttpResponse {
     let collection = client.database("pocNchan").collection("events");
 
+    println!("{:?}", event);
+
     let event_to_doc = doc! {
         "titre de l'evenement": &event.titre_de_levenement,
         "type de l'evenemnt": &event.type_de_levenement.to_string(),

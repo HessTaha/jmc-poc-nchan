@@ -1,31 +1,38 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
 import {
-  TextField,
-  MenuItem,
-  Button,
   Box,
-  Typography,
+  Button,
   FormControl,
   InputLabel,
+  MenuItem,
   Select,
+  TextField,
+  Typography,
 } from "@mui/material";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Event } from '../data';
 
 const AddEvents: React.FC = () => {
   const { handleSubmit, control, reset } = useForm<Event>({
     defaultValues: {
-      title: "",
-      type: "rencontre",
+      titre_de_levenement: "",
+      type_de_levenement: "rencontre",
       date: "",
-      location: "",
-      organizer: "",
+      lieu: "",
+      organisateur: "",
       description: "",
     },
   });
 
   const onSubmit = (data: Event) => {
-    console.log("Form Data:", data);
+
+    fetch("http://localhost:8080/command/register_new_event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...data, date: new Date(data.date).toISOString()
+      })
+    }).catch(e => { console.log(e) })
   };
 
   return (
@@ -47,7 +54,7 @@ const AddEvents: React.FC = () => {
       </Typography>
 
       <Controller
-        name="title"
+        name="titre_de_levenement"
         control={control}
         render={({ field }) => (
           <TextField
@@ -60,14 +67,14 @@ const AddEvents: React.FC = () => {
       />
 
       <Controller
-        name="type"
+        name="type_de_levenement"
         control={control}
         render={({ field }) => (
           <FormControl fullWidth>
             <InputLabel id="type-label">Type</InputLabel>
             <Select {...field} labelId="type-label" label="Type">
               <MenuItem value="rencontre">Rencontre</MenuItem>
-              <MenuItem value="petite annonce">Petite annonce</MenuItem>
+              <MenuItem value="petiteannonce">Petite annonce</MenuItem>
             </Select>
           </FormControl>
         )}
@@ -88,7 +95,7 @@ const AddEvents: React.FC = () => {
       />
 
       <Controller
-        name="location"
+        name="lieu"
         control={control}
         render={({ field }) => (
           <TextField {...field} label="Lieu" required fullWidth />
@@ -96,7 +103,7 @@ const AddEvents: React.FC = () => {
       />
 
       <Controller
-        name="organizer"
+        name="organisateur"
         control={control}
         render={({ field }) => (
           <TextField {...field} label="Organisateur" required fullWidth />
