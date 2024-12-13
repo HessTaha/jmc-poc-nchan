@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongo
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo-data:/data/db
+
+  event-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: event-srv
+    image: event-service
+    entrypoint: ["./event-backend"]
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+
+volumes:
+  mongo-data:

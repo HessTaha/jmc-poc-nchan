@@ -1,30 +1,56 @@
-# Poc nchan
+# Event backend
 
-## Attendus
+Code permettant de démarrer:
+
+1. Une api basique avec 2 endpoints: 
+- GET - /ready -> retourne un status Ok
+- POST - /command/register_new_event -> écrit un event dans une base mongo
+
+2. Un container mongo 
+
+## Set up et installation
 
 
-- Objectifs: 
-	- Mettre en place le service worker sur chrome
-	- Avoir un code fonctionnelle qui implémente les fonctionnalités de notifications
-	- Un document de retour d'expérience
+Dependances: 
+- Docker
+- Docker compose
+- rust
 
-## Todo
+1. Créer un fichier .env
 
-Retour le premier point d'échange, 06-12-2024
+```shell
+MONGO_INITDB_ROOT_USERNAME="admin"
+MONGO_INITDB_ROOT_PASSWORD="admin"
+```
 
-Définir les specs:
+2. Builder les services
 
-Front: 
-- Créer deux pages:
-	- Responsive
-	- une pour pousser un événements
-	- une pour voir les notifications
-- Backend: 
-	- une BDD: pour stocker les événements
-	- Un service api rest pour écrire les événements
-	- Un service nchan pour la partie pub / sub
+```shell
+docker compose build
+```
 
-Point à creuser: 
-- Se renseigner sur les workers service sur navigateurs
-- Se renseigner sur la partie nchan (mise en place du service)
 
+3. Démarrer les services
+
+```shell
+docker compose up
+```
+
+
+4. Tester
+
+Dans le fichier Makefile se trouve les commandes
+
+
+curl -X POST http://localhost:8080/command/register_new_event \
+     -H "Content-Type: application/json" \
+     -d '{
+           "titre_de_levenement": "Conférence Rust 2024",
+           "type_de_levenement": "rencontre",
+           "date": "2024-12-09T14:30:00Z",
+           "lieu": "Paris, France",
+           "organisateur": "Rust France",
+           "description": "Une conférence dédiée au langage Rust."
+         }'
+
+curl -X GET http://localhost:8080/ready 
