@@ -5,24 +5,18 @@ use actix_web::{
 };
 use mongodb::{bson::doc, Client};
 use reqwest::Client as rq;
+use serde_json::json;
 
-use crate::models::event_model::{EventType, RencontreEvent};
+use crate::models::event_model::RencontreEvent;
 
-async fn notify_event_system(type_evenement: EventType, date: &str, lieu: &str) {
+async fn notify_event_system(event: RencontreEvent) {
     let client = rq::new();
-    let data = format!(
-        "Une {} vient d'être publier et aura lieu le {} à {}",
-        type_evenement.to_string(),
-        date,
-        lieu
-    );
-
-    let uri = "http://localhost:8080/pub?channelId=event";
+    let uri = "http://nginx:8081/pub?channelId=event";
 
     let response_result = client
         .post(uri)
-        .header("Content-Type", "text/plain")
-        .body(data)
+        .header("Content-Type", "application/json")
+        .json(&event)
         .send()
         .await;
 
@@ -64,12 +58,7 @@ async fn register_new_event(
                 })
             });
 
-            notify_event_system(
-                cloned_event.type_de_levenement,
-                &cloned_event.date.to_string(),
-                &cloned_event.lieu,
-            )
-            .await;
+            notify_event_system(cloned_event).await;
 
             response
         }

@@ -1,9 +1,9 @@
-import { styled } from "@mui/material/styles";
+import { Badge, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import { FunctionComponent, useEffect, useState } from "react";
-import { Badge, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { AnimatePresence, motion } from "framer-motion";
+import { FunctionComponent, useEffect, useState } from "react";
 
 import { Event } from "../data";
 
@@ -24,7 +24,7 @@ const ListEvents: FunctionComponent = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8081/sub");
+    const socket = new WebSocket("ws://localhost:8081/sub?channelId=event");
 
     socket.onopen = () => {
       console.log("WebSocket connection opened");
@@ -32,6 +32,7 @@ const ListEvents: FunctionComponent = () => {
 
     socket.onmessage = (event) => {
       try {
+        console.log(event)
         const data = JSON.parse(event.data);
 
         const newNotification: Notification = {

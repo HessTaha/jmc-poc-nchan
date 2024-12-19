@@ -17,6 +17,7 @@ async fn main() -> std::io::Result<()> {
     let user = env::var("MONGO_INITDB_ROOT_USERNAME").unwrap();
     let password = env::var("MONGO_INITDB_ROOT_PASSWORD").unwrap();
     let host = env::var("MONGO_HOST").unwrap();
+    let srv_port: u16 = env::var("BACKEND_SRV_PORT").unwrap().parse().unwrap();
     let host: &str = &format!(
         "mongodb://{}:{}@{}:27017/?authSource=admin",
         user, password, host
@@ -37,7 +38,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(db_pool.clone()))
             .wrap(Logger::default())
     })
-    .bind(("0.0.0.0", 8000))?
+    .bind(("0.0.0.0", srv_port))?
     .run()
     .await
 }
