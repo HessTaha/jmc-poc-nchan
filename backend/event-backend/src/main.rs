@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(db_pool.clone()))
             .wrap(Logger::default())
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", 8000))?
     .run()
     .await
 }
