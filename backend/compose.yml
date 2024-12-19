@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - "8081:8081" # Pour les fichiers statiques
+    volumes:
+      - ./nchan/nginx.conf:/etc/nginx/nginx.conf
+      - ./python/static/visualize:/usr/share/nginx/html/visualize
+    depends_on:
+      - event-service
+
+  event-service:
+    build:
+      context: ./event-backend
+      dockerfile: Dockerfile
+    container_name: event-srv
+    image: event-service
+    entrypoint: ["./event-backend"]
+    env_file:
+      - ./event-backend/.env
+    ports:
+      - "8080:8080"
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongo
+    env_file:
+      - ./event-backend/.env
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./event-backend/mongo-data:/data/db
+
+volumes:
+  mongo-data:
