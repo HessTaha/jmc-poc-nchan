@@ -16,5 +16,5 @@ RUN cargo build --release
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 COPY --from=builder /app/target/release/event-backend .
-EXPOSE 8080
+EXPOSE 8000
 ENTRYPOINT ["./event-backend"]

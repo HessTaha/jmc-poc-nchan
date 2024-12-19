@@ -4,8 +4,31 @@ use actix_web::{
     HttpResponse,
 };
 use mongodb::{bson::doc, Client};
+use reqwest::Client as rq;
+use serde_json::json;
 
 use crate::models::event_model::RencontreEvent;
+
+async fn notify_event_system(event: RencontreEvent) {
+    let client = rq::new();
+    let uri = "http://nginx:8081/pub?channelId=event";
+
+    let response_result = client
+        .post(uri)
+        .header("Content-Type", "application/json")
+        .json(&event)
+        .send()
+        .await;
+
+    let response = match response_result {
+        Ok(resp) => resp,
+        Err(err) => {
+            eprintln!("Error sending request: {}", err);
+            return;
+        }
+    };
+    ()
+}
 
 #[post("/register_new_event")]
 async fn register_new_event(
@@ -14,12 +37,12 @@ async fn register_new_event(
 ) -> HttpResponse {
     let collection = client.database("pocNchan").collection("events");
 
-    println!("{:?}", event);
+    let cloned_event = event.clone();
 
     let event_to_doc = doc! {
         "titre de l'evenement": &event.titre_de_levenement,
         "type de l'evenemnt": &event.type_de_levenement.to_string(),
-        "data": &event.date.to_string(),
+        "date": &event.date.to_string(),
         "lieu": &event.lieu,
         "organisateur": &event.organisateur,
         "description": &event.description
@@ -27,15 +50,17 @@ async fn register_new_event(
 
     match collection.insert_one(event_to_doc).await {
         Ok(insert_result) => {
-            // Successfully inserted the document
-            // You can choose to return the inserted ID or the event itself
-            HttpResponse::Ok().json({
+            let response = HttpResponse::Ok().json({
                 serde_json::json!({
                     "status": "success",
                     "inserted_id": insert_result.inserted_id,
                     "event": event.into_inner()
                 })
-            })
+            });
+
+            notify_event_system(cloned_event).await;
+
+            response
         }
         Err(e) => {
             // An error occurred while inserting the document

@@ -1,56 +1,49 @@
-# Event backend
+# Poc nchan
 
-Code permettant de démarrer:
+Ce projet est un exercice et un poc de la solution [nchan]()
 
-1. Une api basique avec 2 endpoints: 
-- GET - /ready -> retourne un status Ok
-- POST - /command/register_new_event -> écrit un event dans une base mongo
-
-2. Un container mongo 
+L'objectif est de mettre en place un système de notifications push avec: 
+- Un server pub/sub
+- Un backend API
+- Un serveur front
 
 ## Set up et installation
-
 
 Dependances: 
 - Docker
 - Docker compose
 - rust
+- nodejs
 
-1. Créer un fichier .env
+1. Créer un fichier .env à mettre au niveau de `backend/event-backend/.env`
 
 ```shell
 MONGO_INITDB_ROOT_USERNAME="admin"
 MONGO_INITDB_ROOT_PASSWORD="admin"
+MONGO_HOST="mongodb"
+BACKEND_SRV_PORT="8080"
 ```
 
-2. Builder les services
+2. Builder les services backend
 
 ```shell
+cd backend
 docker compose build
 ```
 
-
-3. Démarrer les services
+3. Démarrer les services backend: nginx, api, mongodb
 
 ```shell
-docker compose up
+docker compose up 
 ```
 
+4. Démarrer le service front
 
-4. Tester
+```shell
+cd ../frontend
+npm start dev 
+```
 
-Dans le fichier Makefile se trouve les commandes
+5. Tester 
 
-
-curl -X POST http://localhost:8080/command/register_new_event \
-     -H "Content-Type: application/json" \
-     -d '{
-           "titre_de_levenement": "Conférence Rust 2024",
-           "type_de_levenement": "rencontre",
-           "date": "2024-12-09T14:30:00Z",
-           "lieu": "Paris, France",
-           "organisateur": "Rust France",
-           "description": "Une conférence dédiée au langage Rust."
-         }'
-
-curl -X GET http://localhost:8080/ready 
+Aller à l'URL : localhost:5173 et tester
