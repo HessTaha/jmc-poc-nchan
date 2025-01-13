@@ -18,8 +18,10 @@ services:
     container_name: event-srv
     image: event-service
     entrypoint: ["./event-backend"]
+    depends_on:
+      - mongodb
     env_file:
-      - ./event-backend/.env
+      - .env
     ports:
       - 8080:8080
 
@@ -27,11 +29,11 @@ services:
     image: mongo:latest
     container_name: mongo
     env_file:
-      - ./event-backend/.env
+      - .env
     ports:
       - 27017:27017
     volumes:
-      - ./event-backend/mongo-data:/data/db
+      - mongo-data:/data/db
 
 volumes:
   mongo-data:
