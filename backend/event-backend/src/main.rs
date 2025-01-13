@@ -2,12 +2,12 @@ use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, web::scope, App, HttpServer};
 mod infrastructure;
 mod models;
-mod routes;
+mod services;
 
 use env_logger::Env;
 use infrastructure::mongo_repo::db_pool;
-use routes::command::register_new_event::register_new_event;
-use routes::ready::ready;
+use services::core::command::ready::ready;
+use services::events::command::register_new_event::register_new_event;
 use std::env;
 
 #[actix_web::main]
@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     );
     let db_pool = db_pool(host).await.unwrap();
 
-    HttpServer::new(move || {
+    let http_server = HttpServer::new(move || {
         App::new()
             .wrap(
                 Cors::default()
@@ -38,7 +38,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(db_pool.clone()))
             .wrap(Logger::default())
     })
-    .bind(("0.0.0.0", srv_port))?
-    .run()
-    .await
+    .bind(("0.0.0.0", srv_port))?;
+    http_server.run().await
 }

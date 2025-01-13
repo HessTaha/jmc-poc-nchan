@@ -5,29 +5,22 @@ use actix_web::{
 };
 use mongodb::{bson::doc, Client};
 use reqwest::Client as rq;
-use serde_json::json;
 
 use crate::models::event_model::RencontreEvent;
 
-async fn notify_event_system(event: RencontreEvent) {
+async fn notify_event_system(event: RencontreEvent) -> Result<(), String> {
     let client = rq::new();
     let uri = "http://nginx:8081/pub?channelId=event";
 
-    let response_result = client
+    let result = client
         .post(uri)
         .header("Content-Type", "application/json")
         .json(&event)
         .send()
-        .await;
+        .await
+        .map_err(|e| e.to_string())?;
 
-    let response = match response_result {
-        Ok(resp) => resp,
-        Err(err) => {
-            eprintln!("Error sending request: {}", err);
-            return;
-        }
-    };
-    ()
+    Ok(())
 }
 
 #[post("/register_new_event")]
@@ -58,8 +51,10 @@ async fn register_new_event(
                 })
             });
 
-            notify_event_system(cloned_event).await;
-
+            match notify_event_system(cloned_event).await {
+                Ok(_) => (),
+                Err(e) => eprintln!("Could not notify that event was created : {}", e),
+            }
             response
         }
         Err(e) => {
