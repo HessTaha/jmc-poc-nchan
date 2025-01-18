@@ -1,14 +1,11 @@
 /// <reference lib="webworker" />
 
-declare const self: ServiceWorkerGlobalScope;
-declare const clients: Clients;
-declare const indexedDB: IDBFactory;
 // Fonction utilitaire pour ouvrir IndexedDB
-function openDatabase(): Promise<IDBDatabase> {
+function openDatabase() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('NotificationDB', 1);
     request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
+      const db = event.target.result;
       if (!db.objectStoreNames.contains('notifiedMessages')) {
         db.createObjectStore('notifiedMessages', { keyPath: 'messageId' });
       }
@@ -19,9 +16,9 @@ function openDatabase(): Promise<IDBDatabase> {
 }
 
 // Vérifie si un message a déjà été notifié
-async function hasMessageBeenNotified(messageId: string): Promise<boolean> {
+async function hasMessageBeenNotified(messageId) {
   const db = await openDatabase();
-  return new Promise<boolean>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const transaction = db.transaction('notifiedMessages', 'readonly');
     const store = transaction.objectStore('notifiedMessages');
     const request = store.get(messageId);
@@ -32,9 +29,9 @@ async function hasMessageBeenNotified(messageId: string): Promise<boolean> {
 }
 
 // Marque un message comme notifié
-async function markMessageAsNotified(messageId: string): Promise<void> {
+async function markMessageAsNotified(messageId) {
   const db = await openDatabase();
-  return new Promise<void>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const transaction = db.transaction('notifiedMessages', 'readwrite');
     const store = transaction.objectStore('notifiedMessages');
     const request = store.add({ messageId });
@@ -45,9 +42,9 @@ async function markMessageAsNotified(messageId: string): Promise<void> {
 }
 
 // Abonnement à un canal Nchan
-async function subscribeToNchan(channelUrl: string): Promise<void> {
+async function subscribeToNchan(channelUrl) {
   try {
-    const response = await fetch(channelUrl, { mode: 'cors' });
+    const response = await fetch(channelUrl, { /*mode: 'cors'*/ });
     const reader = response.body?.getReader();
 
     if (!reader) {
@@ -80,7 +77,7 @@ async function subscribeToNchan(channelUrl: string): Promise<void> {
 }
 
 // Traite un message reçu
-async function processMessage(message: string): Promise<void> {
+async function processMessage(message) {
   try {
     const data = JSON.parse(message);
     const { messageId, title, body, icon, url } = data;
@@ -104,19 +101,19 @@ async function processMessage(message: string): Promise<void> {
 }
 
 // Écoute de l'événement "install" du service worker
-self.addEventListener('install', (event: ExtendableEvent) => {
+self.addEventListener('install', (event) => {
   console.log('Service Worker installé.');
   event.waitUntil(self.skipWaiting());
 });
 
 // Écoute de l'événement "activate" du service worker
-self.addEventListener('activate', (event: ExtendableEvent) => {
+self.addEventListener('activate', (event) => {
   console.log('Service Worker activé.');
   event.waitUntil(self.clients.claim());
 });
 
 // Gestion des clics sur les notifications
-self.addEventListener('notificationclick', (event: NotificationEvent) => {
+self.addEventListener('notificationclick', (event) => {
   console.log('Notification cliquée.', event.notification.data);
   event.notification.close();
 

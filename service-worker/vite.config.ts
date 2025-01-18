@@ -7,15 +7,6 @@ export default defineConfig({
   plugins: [
     react(),
     mkcert(), // Plugin mkcert pour les certificats SSL locaux
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'src/service-worker.ts', // Fichier source
-          dest: '', // Destination dans le répertoire public
-          rename: 'service-worker.js', // Renommage du fichier
-        },
-      ],
-    }),
   ],
   server: {
     https: false as unknown as ServerOptions['https'],
