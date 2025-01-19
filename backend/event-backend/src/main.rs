@@ -6,8 +6,12 @@ mod services;
 
 use env_logger::Env;
 use infrastructure::mongo_repo::db_pool;
-use services::core::command::ready::ready;
-use services::events::command::register_new_event::register_new_event;
+use services::core::ready::ready;
+use services::events::{
+    command::register_new_event::register_new_event, query::events::get_all_events,
+};
+
+use services::notifications::command::register_new_subscription::save_subscription;
 use std::env;
 
 #[actix_web::main]
@@ -34,7 +38,12 @@ async fn main() -> std::io::Result<()> {
                     .max_age(3600),
             )
             .service(ready)
-            .service(scope("command").service(register_new_event))
+            .service(
+                scope("events")
+                    .service(register_new_event)
+                    .service(get_all_events),
+            )
+            .service(scope("notifications").service(save_subscription))
             .app_data(web::Data::new(db_pool.clone()))
             .wrap(Logger::default())
     })

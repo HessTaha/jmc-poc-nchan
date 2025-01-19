@@ -8,26 +8,12 @@ pub enum EventType {
     PetiteAnnonce,
 }
 
-impl EventType {
-    pub fn to_string(&self) -> String {
-        if *self == EventType::Rencontre {
-            return "rencontre".to_string();
-        } else {
-            return "petite annonce".to_string();
-        }
-    }
-}
-
 #[derive(Serialize, Clone, Deserialize, Debug)]
 pub struct RencontreEvent {
     pub titre_de_levenement: Option<String>,
-
-    pub type_de_levenement: EventType,
+    pub type_de_levenement: Option<EventType>,
     pub date: DateTime<Utc>,
-
     pub lieu: String,
-
     pub organisateur: String,
-
     pub description: String,
 }
